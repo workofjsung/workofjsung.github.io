@@ -54,6 +54,28 @@
     background: #f0f0f0;
   }
 
+  .tabs {
+    display: flex;
+    gap: 1.5rem;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 1.5rem;
+  }
+
+  .tabs a {
+    display: inline-block;
+    padding: 0 0 0.75rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #999;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+  }
+
+  .tabs a.active {
+    color: #111111;
+    border-bottom-color: #111111;
+  }
+
   .weekday-row,
   .calendar-grid {
     display: grid;
@@ -74,6 +96,7 @@
   }
 
   .calendar-grid div {
+    position: relative;
     aspect-ratio: 1 / 1;
     display: flex;
     align-items: flex-start;
@@ -83,11 +106,21 @@
     font-size: 0.9rem;
     border: 1px solid #f0f0f0;
     margin: -0.5px;
+    cursor: pointer;
+  }
+
+  .calendar-grid div:hover {
+    background: #f7f7f7;
   }
 
   .calendar-grid div.empty {
     color: transparent;
     border-color: transparent;
+    cursor: default;
+  }
+
+  .calendar-grid div.empty:hover {
+    background: none;
   }
 
   .calendar-grid div.today {
@@ -95,6 +128,24 @@
     color: #ffffff;
     border-radius: 6px;
     font-weight: 700;
+  }
+
+  .calendar-grid div.today:hover {
+    background: #111111;
+  }
+
+  .calendar-grid div .todo-dot {
+    position: absolute;
+    bottom: 0.35rem;
+    right: 0.4rem;
+    width: 0.35rem;
+    height: 0.35rem;
+    border-radius: 50%;
+    background: #111111;
+  }
+
+  .calendar-grid div.today .todo-dot {
+    background: #ffffff;
   }
 </style>
 </head>
@@ -105,6 +156,11 @@
       <h1 id="month-label"></h1>
       <button id="next-month" aria-label="다음 달">›</button>
     </div>
+
+    <nav class="tabs">
+      <a href="todo.html">Todo List</a>
+      <a href="calendar.html" class="active">Calendar</a>
+    </nav>
 
     <div class="weekday-row">
       <div>SUN</div>
@@ -119,6 +175,7 @@
     <div class="calendar-grid" id="calendar-grid"></div>
   </main>
 
+  <script src="todos.js"></script>
   <script>
     const monthLabel = document.getElementById('month-label');
     const grid = document.getElementById('calendar-grid');
@@ -130,10 +187,24 @@
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
       'July', 'August', 'September', 'October', 'November', 'December'];
 
+    function toDateString(year, month, day) {
+      const mm = String(month + 1).padStart(2, '0');
+      const dd = String(day).padStart(2, '0');
+      return `${year}-${mm}-${dd}`;
+    }
+
+    function handleDayClick(dateString) {
+      const text = window.prompt('할 일을 입력하세요');
+      if (!text || !text.trim()) return;
+      addTodo(text.trim(), dateString);
+      render();
+    }
+
     function render() {
       monthLabel.textContent = `${monthNames[viewMonth]} ${viewYear}`;
       grid.innerHTML = '';
 
+      const todos = getTodos();
       const firstWeekday = new Date(viewYear, viewMonth, 1).getDay();
       const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
 
@@ -149,6 +220,15 @@
         if (viewYear === today.getFullYear() && viewMonth === today.getMonth() && day === today.getDate()) {
           cell.classList.add('today');
         }
+
+        const dateString = toDateString(viewYear, viewMonth, day);
+        if (todos.some((t) => t.date === dateString)) {
+          const dot = document.createElement('span');
+          dot.className = 'todo-dot';
+          cell.appendChild(dot);
+        }
+
+        cell.addEventListener('click', () => handleDayClick(dateString));
         grid.appendChild(cell);
       }
     }

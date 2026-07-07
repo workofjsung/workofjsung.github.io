@@ -32,6 +32,28 @@
     letter-spacing: -0.02em;
   }
 
+  .tabs {
+    display: flex;
+    gap: 1.5rem;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 1.5rem;
+  }
+
+  .tabs a {
+    display: inline-block;
+    padding: 0 0 0.75rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #999;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+  }
+
+  .tabs a.active {
+    color: #111111;
+    border-bottom-color: #111111;
+  }
+
   #todo-input {
     width: 100%;
     box-sizing: border-box;
@@ -79,6 +101,12 @@
     color: #999;
   }
 
+  #todo-list li .todo-date {
+    flex: none;
+    font-size: 0.75rem;
+    color: #999;
+  }
+
   #todo-list li button {
     flex: none;
     width: 1.75rem;
@@ -101,46 +129,77 @@
 <body>
   <main>
     <h1>Work of J Sung Todo List</h1>
+
+    <nav class="tabs">
+      <a href="todo.html" class="active">Todo List</a>
+      <a href="calendar.html">Calendar</a>
+    </nav>
+
     <input id="todo-input" type="text" placeholder="할 일을 입력하고 Enter" autocomplete="off">
     <ul id="todo-list"></ul>
   </main>
 
+  <script src="todos.js"></script>
   <script>
     const input = document.getElementById('todo-input');
     const list = document.getElementById('todo-list');
 
-    function addItem(text) {
-      const li = document.createElement('li');
+    function renderTodos() {
+      const todos = getTodos().slice().sort((a, b) => b.id - a.id);
+      list.innerHTML = '';
 
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.setAttribute('aria-label', '완료 표시');
+      todos.forEach((todo) => {
+        const li = document.createElement('li');
 
-      const span = document.createElement('span');
-      span.textContent = text;
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = todo.done;
+        checkbox.setAttribute('aria-label', '완료 표시');
+        checkbox.addEventListener('change', () => {
+          const all = getTodos();
+          const target = all.find((t) => t.id === todo.id);
+          if (target) target.done = checkbox.checked;
+          saveTodos(all);
+          span.classList.toggle('done', checkbox.checked);
+        });
 
-      checkbox.addEventListener('change', () => {
-        span.classList.toggle('done', checkbox.checked);
+        const span = document.createElement('span');
+        span.textContent = todo.text;
+        if (todo.done) span.classList.add('done');
+
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = '×';
+        removeBtn.setAttribute('aria-label', '삭제');
+        removeBtn.addEventListener('click', () => {
+          saveTodos(getTodos().filter((t) => t.id !== todo.id));
+          renderTodos();
+        });
+
+        li.appendChild(checkbox);
+        li.appendChild(span);
+
+        if (todo.date) {
+          const dateTag = document.createElement('span');
+          dateTag.className = 'todo-date';
+          dateTag.textContent = todo.date;
+          li.appendChild(dateTag);
+        }
+
+        li.appendChild(removeBtn);
+        list.appendChild(li);
       });
-
-      const removeBtn = document.createElement('button');
-      removeBtn.textContent = '×';
-      removeBtn.setAttribute('aria-label', '삭제');
-      removeBtn.addEventListener('click', () => li.remove());
-
-      li.appendChild(checkbox);
-      li.appendChild(span);
-      li.appendChild(removeBtn);
-      list.insertBefore(li, list.firstChild);
     }
 
     input.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter') return;
       const text = input.value.trim();
       if (!text) return;
-      addItem(text);
+      addTodo(text, null);
       input.value = '';
+      renderTodos();
     });
+
+    renderTodos();
   </script>
 </body>
 </html>
