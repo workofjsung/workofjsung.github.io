@@ -40,10 +40,31 @@ function removeTodo(id) {
     .catch((err) => showFirebaseError('removeTodo failed', err));
 }
 
+const TODOS_CACHE_KEY = 'jsung-todos-cache';
+
+function getCachedTodos() {
+  try {
+    const raw = localStorage.getItem(TODOS_CACHE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function setCachedTodos(todos) {
+  try {
+    localStorage.setItem(TODOS_CACHE_KEY, JSON.stringify(todos));
+  } catch {}
+}
+
 function subscribeTodos(callback) {
+  const cached = getCachedTodos();
+  if (cached) callback(cached);
+
   todosRef.on('value', (snapshot) => {
     const val = snapshot.val() || {};
     const todos = Object.entries(val).map(([id, data]) => ({ id, ...data }));
+    setCachedTodos(todos);
     callback(todos);
   }, (err) => showFirebaseError('subscribeTodos failed', err));
 }
