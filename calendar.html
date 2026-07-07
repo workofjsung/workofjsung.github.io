@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendar</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #ffffff;
+    color: #111111;
+  }
+
+  body {
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+
+  main {
+    width: 100%;
+    max-width: 640px;
+    padding: 3rem 1.5rem;
+  }
+
+  .calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+
+  .calendar-header h1 {
+    margin: 0;
+    font-size: clamp(1.25rem, 4vw, 1.75rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .calendar-header button {
+    border: none;
+    background: none;
+    font-size: 1.25rem;
+    line-height: 1;
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    border-radius: 6px;
+    color: #111111;
+  }
+
+  .calendar-header button:hover {
+    background: #f0f0f0;
+  }
+
+  .weekday-row,
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+  }
+
+  .weekday-row {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .weekday-row div {
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #999;
+  }
+
+  .calendar-grid div {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 0.4rem;
+    box-sizing: border-box;
+    font-size: 0.9rem;
+    border: 1px solid #f0f0f0;
+    margin: -0.5px;
+  }
+
+  .calendar-grid div.empty {
+    color: transparent;
+    border-color: transparent;
+  }
+
+  .calendar-grid div.today {
+    background: #111111;
+    color: #ffffff;
+    border-radius: 6px;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+  <main>
+    <div class="calendar-header">
+      <button id="prev-month" aria-label="이전 달">‹</button>
+      <h1 id="month-label"></h1>
+      <button id="next-month" aria-label="다음 달">›</button>
+    </div>
+
+    <div class="weekday-row">
+      <div>SUN</div>
+      <div>MON</div>
+      <div>TUE</div>
+      <div>WED</div>
+      <div>THU</div>
+      <div>FRI</div>
+      <div>SAT</div>
+    </div>
+
+    <div class="calendar-grid" id="calendar-grid"></div>
+  </main>
+
+  <script>
+    const monthLabel = document.getElementById('month-label');
+    const grid = document.getElementById('calendar-grid');
+    const today = new Date();
+
+    let viewYear = today.getFullYear();
+    let viewMonth = today.getMonth();
+
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'];
+
+    function render() {
+      monthLabel.textContent = `${monthNames[viewMonth]} ${viewYear}`;
+      grid.innerHTML = '';
+
+      const firstWeekday = new Date(viewYear, viewMonth, 1).getDay();
+      const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+      for (let i = 0; i < firstWeekday; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'empty';
+        grid.appendChild(cell);
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const cell = document.createElement('div');
+        cell.textContent = day;
+        if (viewYear === today.getFullYear() && viewMonth === today.getMonth() && day === today.getDate()) {
+          cell.classList.add('today');
+        }
+        grid.appendChild(cell);
+      }
+    }
+
+    document.getElementById('prev-month').addEventListener('click', () => {
+      viewMonth -= 1;
+      if (viewMonth < 0) {
+        viewMonth = 11;
+        viewYear -= 1;
+      }
+      render();
+    });
+
+    document.getElementById('next-month').addEventListener('click', () => {
+      viewMonth += 1;
+      if (viewMonth > 11) {
+        viewMonth = 0;
+        viewYear += 1;
+      }
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
