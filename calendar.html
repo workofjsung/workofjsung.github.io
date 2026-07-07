@@ -124,12 +124,12 @@
   }
 
   .calendar-grid div.holiday {
-    background: #f8bad1;
+    background: #f1e0e2;
     color: #F04C4E;
   }
 
   .calendar-grid div.holiday:hover {
-    background: #f8bad1;
+    background: #f1e0e2;
   }
 
   .calendar-grid div.today {
@@ -433,7 +433,7 @@
       openDayDate = dateString;
 
       const holidayName = KOREAN_HOLIDAYS[dateString];
-      dayModalDate.textContent = holidayName ? `${dateString} · ${holidayName}` : dateString;
+      dayModalDate.textContent = holidayName || dateString;
       dayModalDate.classList.toggle('holiday', Boolean(holidayName));
 
       dayModalInput.value = '';
