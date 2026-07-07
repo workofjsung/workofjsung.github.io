@@ -12,15 +12,18 @@ firebase.initializeApp(firebaseConfig);
 const todosRef = firebase.database().ref('todos');
 
 function addTodo(text, date) {
-  todosRef.push({ text, done: false, date: date || null, createdAt: Date.now() });
+  todosRef.push({ text, done: false, date: date || null, createdAt: Date.now() })
+    .catch((err) => console.error('addTodo failed:', err));
 }
 
 function updateTodo(id, changes) {
-  todosRef.child(id).update(changes);
+  todosRef.child(id).update(changes)
+    .catch((err) => console.error('updateTodo failed:', err));
 }
 
 function removeTodo(id) {
-  todosRef.child(id).remove();
+  todosRef.child(id).remove()
+    .catch((err) => console.error('removeTodo failed:', err));
 }
 
 function subscribeTodos(callback) {
@@ -28,5 +31,5 @@ function subscribeTodos(callback) {
     const val = snapshot.val() || {};
     const todos = Object.entries(val).map(([id, data]) => ({ id, ...data }));
     callback(todos);
-  });
+  }, (err) => console.error('subscribeTodos failed:', err));
 }
