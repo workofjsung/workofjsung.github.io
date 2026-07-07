@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>할일 추가</title>
+<title>Work of J Sung Todo List</title>
 <style>
   html, body {
     margin: 0;
@@ -23,6 +23,13 @@
     width: 100%;
     max-width: 480px;
     padding: 3rem 1.5rem;
+  }
+
+  h1 {
+    margin: 0 0 1.5rem;
+    font-size: clamp(1.25rem, 4vw, 1.75rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
   }
 
   #todo-input {
@@ -54,8 +61,22 @@
     border-bottom: 1px solid #eee;
   }
 
+  #todo-list li input[type="checkbox"] {
+    flex: none;
+    width: 1.125rem;
+    height: 1.125rem;
+    margin: 0;
+    cursor: pointer;
+  }
+
   #todo-list li span {
+    flex: 1;
     word-break: break-word;
+  }
+
+  #todo-list li span.done {
+    text-decoration: line-through;
+    color: #999;
   }
 
   #todo-list li button {
@@ -79,6 +100,7 @@
 </head>
 <body>
   <main>
+    <h1>Work of J Sung Todo List</h1>
     <input id="todo-input" type="text" placeholder="할 일을 입력하고 Enter" autocomplete="off">
     <ul id="todo-list"></ul>
   </main>
@@ -90,14 +112,23 @@
     function addItem(text) {
       const li = document.createElement('li');
 
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.setAttribute('aria-label', '완료 표시');
+
       const span = document.createElement('span');
       span.textContent = text;
+
+      checkbox.addEventListener('change', () => {
+        span.classList.toggle('done', checkbox.checked);
+      });
 
       const removeBtn = document.createElement('button');
       removeBtn.textContent = '×';
       removeBtn.setAttribute('aria-label', '삭제');
       removeBtn.addEventListener('click', () => li.remove());
 
+      li.appendChild(checkbox);
       li.appendChild(span);
       li.appendChild(removeBtn);
       list.insertBefore(li, list.firstChild);
