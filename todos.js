@@ -11,19 +11,33 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const todosRef = firebase.database().ref('todos');
 
+function showFirebaseError(label, err) {
+  console.error(label, err);
+  let banner = document.getElementById('firebase-error-banner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'firebase-error-banner';
+    banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#fee2e2;color:#991b1b;' +
+      'font-family:monospace;font-size:12px;padding:10px;white-space:pre-wrap;word-break:break-word;' +
+      'z-index:9999;border-top:2px solid #991b1b;max-height:40vh;overflow:auto;';
+    document.body.appendChild(banner);
+  }
+  banner.textContent = `${label}: ${err && err.message ? err.message : err}`;
+}
+
 function addTodo(text, date) {
   todosRef.push({ text, done: false, date: date || null, createdAt: Date.now() })
-    .catch((err) => console.error('addTodo failed:', err));
+    .catch((err) => showFirebaseError('addTodo failed', err));
 }
 
 function updateTodo(id, changes) {
   todosRef.child(id).update(changes)
-    .catch((err) => console.error('updateTodo failed:', err));
+    .catch((err) => showFirebaseError('updateTodo failed', err));
 }
 
 function removeTodo(id) {
   todosRef.child(id).remove()
-    .catch((err) => console.error('removeTodo failed:', err));
+    .catch((err) => showFirebaseError('removeTodo failed', err));
 }
 
 function subscribeTodos(callback) {
@@ -31,5 +45,5 @@ function subscribeTodos(callback) {
     const val = snapshot.val() || {};
     const todos = Object.entries(val).map(([id, data]) => ({ id, ...data }));
     callback(todos);
-  }, (err) => console.error('subscribeTodos failed:', err));
+  }, (err) => showFirebaseError('subscribeTodos failed', err));
 }
