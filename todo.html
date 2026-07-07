@@ -162,16 +162,18 @@
     <ul id="todo-list"></ul>
   </main>
 
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <script src="todos.js"></script>
   <script>
     const input = document.getElementById('todo-input');
     const list = document.getElementById('todo-list');
 
-    function renderTodos() {
-      const todos = getTodos().slice().sort((a, b) => b.id - a.id);
+    function renderTodos(todos) {
+      const sorted = todos.slice().sort((a, b) => b.createdAt - a.createdAt);
       list.innerHTML = '';
 
-      todos.forEach((todo) => {
+      sorted.forEach((todo) => {
         const li = document.createElement('li');
 
         const checkbox = document.createElement('input');
@@ -179,11 +181,7 @@
         checkbox.checked = todo.done;
         checkbox.setAttribute('aria-label', '완료 표시');
         checkbox.addEventListener('change', () => {
-          const all = getTodos();
-          const target = all.find((t) => t.id === todo.id);
-          if (target) target.done = checkbox.checked;
-          saveTodos(all);
-          span.classList.toggle('done', checkbox.checked);
+          updateTodo(todo.id, { done: checkbox.checked });
         });
 
         const span = document.createElement('span');
@@ -193,10 +191,7 @@
         const removeBtn = document.createElement('button');
         removeBtn.textContent = '×';
         removeBtn.setAttribute('aria-label', '삭제');
-        removeBtn.addEventListener('click', () => {
-          saveTodos(getTodos().filter((t) => t.id !== todo.id));
-          renderTodos();
-        });
+        removeBtn.addEventListener('click', () => removeTodo(todo.id));
 
         li.appendChild(checkbox);
         li.appendChild(span);
@@ -219,10 +214,9 @@
       if (!text) return;
       addTodo(text, null);
       input.value = '';
-      renderTodos();
     });
 
-    renderTodos();
+    subscribeTodos(renderTodos);
   </script>
 </body>
 </html>

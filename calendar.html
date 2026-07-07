@@ -171,6 +171,8 @@
     <div class="calendar-grid" id="calendar-grid"></div>
   </main>
 
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <script src="todos.js"></script>
   <script>
     const monthLabel = document.getElementById('month-label');
@@ -179,6 +181,7 @@
 
     let viewYear = today.getFullYear();
     let viewMonth = today.getMonth();
+    let todos = [];
 
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
       'July', 'August', 'September', 'October', 'November', 'December'];
@@ -193,14 +196,12 @@
       const text = window.prompt('할 일을 입력하세요');
       if (!text || !text.trim()) return;
       addTodo(text.trim(), dateString);
-      render();
     }
 
     function render() {
       monthLabel.textContent = `${monthNames[viewMonth]} ${viewYear}`;
       grid.innerHTML = '';
 
-      const todos = getTodos();
       const firstWeekday = new Date(viewYear, viewMonth, 1).getDay();
       const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
 
@@ -247,7 +248,10 @@
       render();
     });
 
-    render();
+    subscribeTodos((updatedTodos) => {
+      todos = updatedTodos;
+      render();
+    });
   </script>
 </body>
 </html>

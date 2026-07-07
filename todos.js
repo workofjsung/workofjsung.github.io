@@ -1,21 +1,32 @@
-const TODOS_STORAGE_KEY = 'jsung-todos';
+const firebaseConfig = {
+  apiKey: "AIzaSyBHrAvfSNS8pet9sy1afcl6waMvs4YPecE",
+  authDomain: "workofjsung.firebaseapp.com",
+  databaseURL: "https://workofjsung-default-rtdb.firebaseio.com",
+  projectId: "workofjsung",
+  storageBucket: "workofjsung.firebasestorage.app",
+  messagingSenderId: "154766994690",
+  appId: "1:154766994690:web:cd0429e2cfd7821deca61b"
+};
 
-function getTodos() {
-  try {
-    const raw = localStorage.getItem(TODOS_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveTodos(todos) {
-  localStorage.setItem(TODOS_STORAGE_KEY, JSON.stringify(todos));
-}
+firebase.initializeApp(firebaseConfig);
+const todosRef = firebase.database().ref('todos');
 
 function addTodo(text, date) {
-  const todos = getTodos();
-  todos.push({ id: Date.now() + Math.random(), text, done: false, date: date || null });
-  saveTodos(todos);
-  return todos;
+  todosRef.push({ text, done: false, date: date || null, createdAt: Date.now() });
+}
+
+function updateTodo(id, changes) {
+  todosRef.child(id).update(changes);
+}
+
+function removeTodo(id) {
+  todosRef.child(id).remove();
+}
+
+function subscribeTodos(callback) {
+  todosRef.on('value', (snapshot) => {
+    const val = snapshot.val() || {};
+    const todos = Object.entries(val).map(([id, data]) => ({ id, ...data }));
+    callback(todos);
+  });
 }
