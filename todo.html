@@ -249,6 +249,11 @@
     background: none;
   }
 
+  .mini-cal-grid div.today {
+    background: #e5e5e5;
+    font-weight: 700;
+  }
+
   .mini-cal-grid div.selected {
     background: #111111;
     color: #ffffff;
@@ -438,6 +443,7 @@
       miniCalLabel.textContent = `${monthNames[pickerMonth]} ${pickerYear}`;
       miniCalGrid.innerHTML = '';
 
+      const today = todayString();
       const firstWeekday = new Date(pickerYear, pickerMonth, 1).getDay();
       const daysInMonth = new Date(pickerYear, pickerMonth + 1, 0).getDate();
 
@@ -451,6 +457,7 @@
         const cell = document.createElement('div');
         cell.textContent = day;
         const dateString = toDateString(pickerYear, pickerMonth, day);
+        if (dateString === today) cell.classList.add('today');
         if (dateString === selectedDate) cell.classList.add('selected');
         cell.addEventListener('click', () => {
           selectedDate = dateString;
@@ -509,6 +516,9 @@
     });
 
     dateModalReset.addEventListener('click', () => {
+      const now = new Date();
+      pickerYear = now.getFullYear();
+      pickerMonth = now.getMonth();
       selectedDate = null;
       renderMiniCal();
     });
