@@ -124,12 +124,12 @@
   }
 
   .calendar-grid div.holiday {
-    background: #fce4ec;
-    color: #c2185b;
+    background: #f8bad1;
+    color: #F04C4E;
   }
 
   .calendar-grid div.holiday:hover {
-    background: #fce4ec;
+    background: #f8bad1;
   }
 
   .calendar-grid div.today {
@@ -150,7 +150,7 @@
     width: 0.35rem;
     height: 0.35rem;
     border-radius: 50%;
-    background: #3b82f6;
+    background: #3da7de;
   }
 
   .day-modal {
@@ -190,6 +190,10 @@
     margin: 0;
     font-size: 1.1rem;
     font-weight: 700;
+  }
+
+  .day-modal-header h2.holiday {
+    color: #F04C4E;
   }
 
   .day-modal-header button {
@@ -236,8 +240,8 @@
   }
 
   #day-modal-list li input[type="checkbox"]:checked {
-    background: #22c55e;
-    border-color: #22c55e;
+    background: #30b44a;
+    border-color: #30b44a;
   }
 
   #day-modal-list li input[type="checkbox"]:checked::after {
@@ -427,7 +431,11 @@
 
     function openDayModal(dateString) {
       openDayDate = dateString;
-      dayModalDate.textContent = dateString;
+
+      const holidayName = KOREAN_HOLIDAYS[dateString];
+      dayModalDate.textContent = holidayName ? `${dateString} · ${holidayName}` : dateString;
+      dayModalDate.classList.toggle('holiday', Boolean(holidayName));
+
       dayModalInput.value = '';
       renderDayModalList();
       dayModal.classList.remove('hidden');
