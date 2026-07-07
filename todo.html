@@ -98,8 +98,8 @@
   }
 
   #todo-list li input[type="checkbox"]:checked {
-    background: #111111;
-    border-color: #111111;
+    background: #22c55e;
+    border-color: #22c55e;
   }
 
   #todo-list li input[type="checkbox"]:checked::after {
@@ -122,6 +122,10 @@
   #todo-list li span.done {
     text-decoration: line-through;
     color: #999;
+  }
+
+  #todo-list li.overdue {
+    opacity: 0.45;
   }
 
   #todo-list li .todo-date {
@@ -169,12 +173,28 @@
     const input = document.getElementById('todo-input');
     const list = document.getElementById('todo-list');
 
+    function todayString() {
+      const d = new Date();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${d.getFullYear()}-${mm}-${dd}`;
+    }
+
     function renderTodos(todos) {
-      const sorted = todos.slice().sort((a, b) => b.createdAt - a.createdAt);
+      const today = todayString();
+      const sorted = todos.slice().sort((a, b) => {
+        if (a.date && b.date) return a.date < b.date ? -1 : a.date > b.date ? 1 : 0;
+        if (a.date && !b.date) return -1;
+        if (!a.date && b.date) return 1;
+        return b.createdAt - a.createdAt;
+      });
       list.innerHTML = '';
 
       sorted.forEach((todo) => {
         const li = document.createElement('li');
+        if (todo.date && todo.date < today && !todo.done) {
+          li.classList.add('overdue');
+        }
 
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
