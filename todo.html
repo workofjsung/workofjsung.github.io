@@ -264,13 +264,18 @@
   #date-modal-reset,
   #date-modal-skip {
     flex: 1;
+    height: 3rem;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border: 1px solid #ccc;
     background: none;
     color: #111111;
     font-size: 0.9rem;
     font-weight: 700;
-    padding: 0.65rem 1rem;
-    border-radius: 8px;
+    padding: 0 1rem;
+    border-radius: 9999px;
     cursor: pointer;
   }
 
@@ -336,8 +341,8 @@
       <div class="mini-cal-grid" id="mini-cal-grid"></div>
 
       <div class="date-modal-actions">
-        <button id="date-modal-reset">초기화</button>
-        <button id="date-modal-skip">건너뛰기</button>
+        <button id="date-modal-reset">reset</button>
+        <button id="date-modal-skip">skip</button>
         <button id="date-modal-confirm" aria-label="확인">✓</button>
       </div>
     </div>
