@@ -258,7 +258,10 @@
 
   #day-modal-list li span.done {
     text-decoration: line-through;
-    color: #999;
+  }
+
+  #day-modal-list li span.muted {
+    color: #4d4d4d;
   }
 
   #day-modal-list li button {
@@ -391,6 +394,9 @@
     }
 
     function renderDayModalList() {
+      const todayStr = toDateString(today.getFullYear(), today.getMonth(), today.getDate());
+      const isPastDay = openDayDate < todayStr;
+
       const dayTodos = todos
         .filter((t) => t.date === openDayDate)
         .sort((a, b) => b.createdAt - a.createdAt);
@@ -412,6 +418,7 @@
         const span = document.createElement('span');
         span.textContent = todo.text;
         if (todo.done) span.classList.add('done');
+        if (todo.done || isPastDay) span.classList.add('muted');
 
         const removeBtn = document.createElement('button');
         removeBtn.textContent = '×';
