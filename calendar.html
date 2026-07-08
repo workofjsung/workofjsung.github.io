@@ -148,6 +148,10 @@
     background: #3da7de;
   }
 
+  .calendar-grid div .todo-dot.muted {
+    background: #4d4d4d;
+  }
+
   .day-modal {
     position: fixed;
     inset: 0;
@@ -471,6 +475,7 @@
       monthLabel.textContent = `${monthNames[viewMonth]} ${viewYear}`;
       grid.innerHTML = '';
 
+      const todayStr = toDateString(today.getFullYear(), today.getMonth(), today.getDate());
       const firstWeekday = new Date(viewYear, viewMonth, 1).getDay();
       const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
 
@@ -494,9 +499,12 @@
           cell.title = KOREAN_HOLIDAYS[dateString];
         }
 
-        if (todos.some((t) => t.date === dateString)) {
+        const dayTodos = todos.filter((t) => t.date === dateString);
+        if (dayTodos.length) {
+          const isPast = dateString < todayStr;
+          const allDone = dayTodos.every((t) => t.done);
           const dot = document.createElement('span');
-          dot.className = 'todo-dot';
+          dot.className = 'todo-dot' + (isPast || allDone ? ' muted' : '');
           cell.appendChild(dot);
         }
 
